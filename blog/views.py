@@ -1,5 +1,6 @@
 import datetime
-import time
+
+from django.contrib.postgres.search import SearchVector, SearchRank, SearchQuery
 from django.core.mail import send_mail
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Count
@@ -9,7 +10,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from taggit.models import Tag
 
-from blog.forms import EmailPostForm, CommentForm
+from blog.forms import EmailPostForm, CommentForm, SearchForm
 from blog.models import Post, Comment
 
 
@@ -18,13 +19,13 @@ def log(c):
 
 
 def post_list(request, tag_slug=None):
-    all_posts = Post.objects.all()
+    all_posts = Post.published.all()
     tag = None
     if tag_slug:
         tag = get_object_or_404(Tag, slug=tag_slug)
         all_posts = all_posts.filter(tags__in=[tag])
         # todo delete
-        log(all_posts.query)
+        # log(all_posts.query)
     paginator = Paginator(all_posts, 3)
     page = request.GET.get('page', 1)
     try:
@@ -65,17 +66,19 @@ def post_detail(request, year, month, day, post):
     post_tags_ids = post.tags.values_list('id', flat=True)
     similar_posts = Post.published.filter(tags__in=post_tags_ids).exclude(id=post.id)
     # todo delete
-    log(similar_posts.query)
-    similar_posts = similar_posts.annotate(same_tags=Count('tags')).order_by('-same_tags', '-publish')[:4]
+    # log(similar_posts.query)
+    similar_posts = similar_posts.annotate(same_tags=Count('tags')).order_by(
+        '-same_tags', '-publish')[:4]
     # todo delete
-    log(similar_posts.query)
-    return render(request, 'blog/post/detail.html', {
-        'post': post,
-        'comments': comments,
-        'new_comment': new_comment,
-        'comment_form': comment_form,
-        'similar_posts': similar_posts,
-    })
+    # log(similar_posts.query)
+    return render(
+        request, 'blog/post/detail.html', {
+            'post': post,
+            'comments': comments,
+            'new_comment': new_comment,
+            'comment_form': comment_form,
+            'similar_posts': similar_posts,
+        })
 
 
 def post_share(request, post_id):
@@ -99,3 +102,21 @@ def post_share(request, post_id):
     else:
         form = EmailPostForm()
     return render(request, 'blog/post/share.html', {'post': post, 'form': form, 'sent': sent})
+
+
+def post_search(request):
+    form = SearchForm(request.GET or None)
+    query = None
+    results = None
+    if form.is_valid():
+        query = form.cleaned_data['query']
+
+        search_vector = SearchVector('title', weight='A') + SearchVector('body', weight='B')
+        search_query = SearchQuery(query)
+        results = Post.published.annotate(rank=SearchRank(search_vector, search_query)).filter(
+            rank__gte=0.3).order_by('-rank')
+    return render(request, 'blog/post/search.html', {
+        'form': form,
+        'query': query,
+        'results': results
+    })
