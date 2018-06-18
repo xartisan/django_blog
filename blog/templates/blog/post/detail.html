@@ -4,9 +4,9 @@
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
-    <h1>{{ post.title }}</h1>
-    <p class="date">
-        Published {{ post.publish }} by {{ post.author }}
+    <h1 class="text-center h1-responsive font-bold dark-grey-text">{{ post.title }}</h1>
+    <p class="date text-center">
+        发布于 {{ post.publish }}
     </p>
     {{ post.body|markdown }}
     <p>

@@ -1,31 +1,75 @@
 {% extends "blog/base.html" %}
 {% load blog_tags %}
 
-{% block title %}My Blog{% endblock %}
+{% block title %}我的博客{% endblock %}
 
 {% block content %}
-    <h1>My Blog</h1>
+    <h1 class="mb-4">博客</h1>
     {% if tag %}
         <h2>Posts tagged with "{{ tag.name }}"</h2>
     {% endif %}
+    {#    {% for post in posts %}#}
+    {#        <h2>#}
+    {#            <a href="{{ post.get_absolute_url }}">#}
+    {#                {{ post.title }}#}
+    {#            </a>#}
+    {#        </h2>#}
+    {#        <p class="tags">Tags:#}
+    {#            {% for tag in post.tags.all %}#}
+    {#                <a href="{% url "blog:post_list_by_tag" tag.slug %}">#}
+    {#                    {{ tag.name }}#}
+    {#                </a>#}
+    {#                {% if not forloop.last %}, {% endif %}#}
+    {#            {% endfor %}#}
+    {#        </p>#}
+    {#        <p class="date">#}
+    {#            Published {{ post.publish }} by {{ post.author }}#}
+    {#        </p>#}
+    {#        {{ post.body|markdown|truncatewords:30 }}#}
+    {#    {% endfor %}#}
+
+
     {% for post in posts %}
-        <h2>
-            <a href="{{ post.get_absolute_url }}">
-                {{ post.title }}
-            </a>
-        </h2>
-        <p class="tags">Tags:
-            {% for tag in post.tags.all %}
-                <a href="{% url "blog:post_list_by_tag" tag.slug %}">
-                    {{ tag.name }}
-                </a>
-                {% if not forloop.last %}, {% endif %}
-            {% endfor %}
-        </p>
-        <p class="date">
-            Published {{ post.publish }} by {{ post.author }}
-        </p>
-        {{ post.body|markdown|truncatewords:30 }}
+
+        <!--Post-->
+        <div class="post-wrapper wow fadeIn" data-wow-delay="0.2s">
+            <!--Post data-->
+            <h2 style="text-align: center" class="h2-responsive dark-grey-text font-bold"><a class="dark-grey-text"
+                                                                                             href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                <small class="text-muted"></small>
+            </h2>
+            <p style="text-align: center;" class="tags">标签:
+                {% for tag in post.tags.all %}
+                    <a href="{% url "blog:post_list_by_tag" tag.slug %}" class="fa fa-tag">
+                        {{ tag.name }}
+                    </a>
+                    {% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <h6 style="text-align: center;">{{ post.publish }}</h6>
+
+            <br>
+
+            <!--Featured image -->
+{#            <div class="view overlay hm-white-light z-depth-1-half rounded">#}
+{#                <img src="https://mdbootstrap.com/img/Photos/Others/images/76.jpg" class="img-fluid" alt="">#}
+{#                <div class="mask">#}
+{#                </div>#}
+{#            </div>#}
+
+            <br>
+
+            <!--Post excerpt-->
+            <p>{{ post.body|markdown|truncatewords:30 }}</p>
+
+            <!--"Read more" button-->
+            <a href="{{ post.get_absolute_url }}" class="btn btn-blue btn-md">Read more</a>
+        </div>
+        <!--/.Post-->
+        {% if not forloop.last %}
+            <hr class="mt-5">
+        {% endif %}
+
     {% endfor %}
     {% include "pagination.html" with page=posts %}
 {% endblock %}
