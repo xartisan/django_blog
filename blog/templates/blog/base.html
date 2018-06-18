@@ -3,8 +3,69 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>{% block title %}{% endblock %}</title>
     <link href="{% static "css/blog.css" %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="{% static "css/mdb.min.css" %}" rel="stylesheet">
+
+    <link href="{% static "css/style.css" %}" rel="stylesheet">
+    <!-- Template styles -->
+    <style rel="stylesheet">
+        /* TEMPLATE STYLES */
+
+        main {
+            padding-top: 3rem;
+            padding-bottom: 2rem;
+        }
+
+        .widget-wrapper {
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 2rem;
+        }
+
+        .navbar {
+            background-color: #53463d;
+        }
+
+        footer.page-footer {
+            background-color: #53463d;
+            margin-top: 2rem;
+        }
+
+        .list-group-item.active {
+            background-color: #a3b0c2;
+            border-color: #a3b0c2
+        }
+
+        .list-group-item:not(.active) {
+            color: #222;
+        }
+
+        .list-group-item:not(.active):hover {
+            color: #666;
+        }
+
+        .card {
+            font-weight: 300;
+        }
+
+        .navbar .btn-group .dropdown-menu a:hover {
+            color: #000 !important;
+        }
+
+        .navbar .btn-group .dropdown-menu a:active {
+            color: #fff !important;
+        }
+    </style>
+
 </head>
 <body>
 <div id="content">
