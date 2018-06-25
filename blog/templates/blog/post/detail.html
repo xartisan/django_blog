@@ -4,47 +4,61 @@
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
-    <h1 class="text-center h1-responsive font-bold dark-grey-text">{{ post.title }}</h1>
-    <p class="date text-center">
-        发布于 {{ post.publish }}
-    </p>
-    {{ post.body|markdown }}
-    <p>
-        <a href="{% url "blog:post_share" post.id %}">
-            Share this post
-        </a>
-    </p>
-    <h2>Similar posts</h2>
-    {% for similar_post in similar_posts %}
-        <p>
-            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+    <div class="paper-effect">
+        <h1 class="text-center h1-responsive font-bold dark-grey-text">{{ post.title }}</h1>
+        <p class="date text-center">
+            发布于 {{ post.publish }}
         </p>
-    {% endfor %}
-
-    {% with comments.count as total_comments %}
-        <h2>
-            {{ total_comments }} comment{{ total_comments|pluralize }}
-        </h2>
-    {% endwith %}
-    {% for comment in comments %}
-        <div class="comment">
-            <p class="info">
-                Comment {{ forloop.counter }} by {{ comment.name }}
-                {{ comment.created }}
-            </p>
-            {{ comment.body|linebreaks }}
+        <div class="markdown-body">
+            {{ post.body|markdown }}
         </div>
-    {% empty %}
-        <p>There are no comments yet</p>
-    {% endfor %}
-    {% if new_comment %}
-        <h2>Your comment has been added.</h2>
-    {% else %}
-        <h2>Add a new comment</h2>
-        <form action="." method="post">
-            {{ comment_form.as_p }}
-            {% csrf_token %}
-            <p><input type="submit" value="Add comment"></p>
-        </form>
+        {#        <p>#}
+        {#            <a href="{% url "blog:post_share" post.id %}">#}
+        {#                Share this post#}
+        {#            </a>#}
+        {#        </p>#}
+    </div>
+    {% if similar_posts %}
+        <div class="paper-effect mt-3">
+            <h3 class="h3-responsive dark-grey-text">相似文章</h2>
+                <ul>
+                    {% for similar_post in similar_posts %}
+                        <li>
+                            <a href="{{ similar_post.get_absolute_url }}">{{ similar_post.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+        </div>
     {% endif %}
+
+    {% if comments %}
+        <div class="paper-effect mt-3">
+            {% with comments.count as total_comments %}
+                <h2>
+                    {{ total_comments }}条评论
+                </h2>
+            {% endwith %}
+            {% for comment in comments %}
+                <div class="comment">
+                    <p class="info">
+                        评论 {{ forloop.counter }} by {{ comment.name }}
+                        {{ comment.created }}
+                    </p>
+                    {{ comment.body|linebreaks }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <div class="container mt-3">
+        {% if new_comment %}
+            <h2>评论添加成功！</h2>
+        {% else %}
+            <h2>添加评论</h2>
+            <form action="." method="post">
+                {{ comment_form.as_p }}
+                {% csrf_token %}
+                <p><input type="submit" class="mt-4 btn btn-blue btn-md" value="添加评论"></p>
+            </form>
+        {% endif %}
+    </div>
 {% endblock %}

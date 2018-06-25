@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+
 from dotenv import load_dotenv, find_dotenv
 
 # load env settings
@@ -133,3 +134,5 @@ STATICFILES_DIRS = (
 )
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+POSTS_PER_PAGE = 1

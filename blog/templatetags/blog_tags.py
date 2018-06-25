@@ -36,6 +36,20 @@ def all_tags():
     return Tag.objects.annotate(num_posts=Count('post')).filter(num_posts__gt=0)
 
 
+@register.simple_tag(takes_context=True)
+def query_transform(context, **kwargs):
+    request = context['request']
+    updated = request.GET.copy()
+    for k, v in kwargs.items():
+        updated[k] = v
+    return updated.urlencode()
+
+
 @register.filter(name='markdown')
 def markdown_format(text):
-    return mark_safe(markdown.markdown(text))
+    return mark_safe(markdown.markdown(text, extensions=[
+        'markdown.extensions.extra',
+        'markdown.extensions.codehilite',
+        'markdown.extensions.toc',
+        'markdown.extensions.tables',
+    ]))

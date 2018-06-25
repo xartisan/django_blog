@@ -1,17 +1,18 @@
 import datetime
 
+from django.conf import settings
 from django.contrib.postgres.search import SearchVector, SearchRank, SearchQuery
 from django.core.mail import send_mail
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Count
 from django.shortcuts import render, get_object_or_404
-
 # Create your views here.
 from django.views.generic import ListView
 from taggit.models import Tag
 
+from blog import pager
 from blog.forms import EmailPostForm, CommentForm, SearchForm
-from blog.models import Post, Comment
+from blog.models import Post
 
 
 def log(c):
@@ -26,7 +27,7 @@ def post_list(request, tag_slug=None):
         all_posts = all_posts.filter(tags__in=[tag])
         # todo delete
         # log(all_posts.query)
-    paginator = Paginator(all_posts, 3)
+    paginator = Paginator(all_posts, settings.POSTS_PER_PAGE)
     page = request.GET.get('page', 1)
     try:
         posts = paginator.page(page)
@@ -35,7 +36,13 @@ def post_list(request, tag_slug=None):
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
 
-    return render(request, 'blog/post/list.html', {'posts': posts, 'page': page, 'tag': tag})
+    page_obj = pager.Page(posts.number, paginator.num_pages)
+    return render(request, 'blog/post/list.html', {
+        'posts': posts,
+        'page': page,
+        'tag': tag,
+        'page_obj': page_obj,
+    })
 
 
 class PostListView(ListView):
@@ -71,6 +78,7 @@ def post_detail(request, year, month, day, post):
         '-same_tags', '-publish')[:4]
     # todo delete
     # log(similar_posts.query)
+    log(similar_posts.all())
     return render(
         request, 'blog/post/detail.html', {
             'post': post,
@@ -107,16 +115,30 @@ def post_share(request, post_id):
 def post_search(request):
     form = SearchForm(request.GET or None)
     query = None
-    results = None
+    posts = None
+    page_obj = None
+    paginator = None
     if form.is_valid():
         query = form.cleaned_data['query']
 
         search_vector = SearchVector('title', weight='A') + SearchVector('body', weight='B')
         search_query = SearchQuery(query)
-        results = Post.published.annotate(rank=SearchRank(search_vector, search_query)).filter(
+        posts = Post.published.annotate(rank=SearchRank(search_vector, search_query)).filter(
             rank__gte=0.3).order_by('-rank')
-    return render(request, 'blog/post/search.html', {
-        'form': form,
+        paginator = Paginator(posts, settings.POSTS_PER_PAGE)
+        page = request.GET.get('page', 1)
+        try:
+            posts = paginator.page(page)
+        except PageNotAnInteger:
+            posts = paginator.page(1)
+        except EmptyPage:
+            posts = paginator.page(paginator.num_pages)
+
+        page_obj = pager.Page(posts.number, paginator.num_pages)
+
+    return render(request, 'blog/post/list.html', {
         'query': query,
-        'results': results
+        'paginator': paginator,
+        'posts': posts,
+        'page_obj': page_obj,
     })

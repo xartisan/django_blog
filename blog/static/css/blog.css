@@ -60,7 +60,7 @@ input, textarea {
     float: left;
     margin: 0 0 10px;
     background: #ededed;
-    border: 0;
+    /*border: 0;*/
     padding: 6px 10px;
     font-size: 12px;
 }

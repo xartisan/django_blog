@@ -1,13 +1,41 @@
-<div class="pagination">
-  <span class="step-links">
-    {% if page.has_previous %}
-      <a href="?page={{ page.previous_page_number }}">Previous</a>
-    {% endif %}
-    <span class="current">
-      Page {{ page.number }} of {{ page.paginator.num_pages }}.
-    </span>
-      {% if page.has_next %}
-        <a href="?page={{ page.next_page_number }}">Next</a>
-      {% endif %}
-  </span>
-</div>
+<!--/.Pagination-->
+{% load blog_tags %}
+<nav class="mt-5">
+    <ul class="pagination flex-center pg-primary  wow fadeIn" data-wow-delay="0.2s">
+        {% if page.has_left %}
+            <li class="page-item">
+                <a class="page-link" href="?{% query_transform page=page.number|add:-1 %}">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">上一页</span>
+                </a>
+            </li>
+        {% endif %}
+        {% if page.has_left_most %}
+            <li class="page-item"><a class="page-link" href="?{% query_transform page=1 %}">1</a></li>
+            {% if page.has_left_most_ellipsis %}
+                <li><span>...</span></li>
+            {% endif %}
+        {% endif %}
+        {% for i in page.page_range %}
+            <li {% ifequal page.number i %}class="page-item active" {% else %} class="page-item" {% endifequal %}>
+                <a href="?{% query_transform page=i %}" class="page-link">{{ i }}</a>
+            </li>
+        {% endfor %}
+
+        {% if page.has_right_most %}
+            {% if page.has_right_most_ellipsis %}
+                <li><span>...</span></li>
+            {% endif %}
+            <li class="page-item"><a class="page-link"
+                                     href="?{% query_transform page=page.num_pages %}">{{ page.num_pages }}</a></li>
+        {% endif %}
+        {% if page.has_right %}
+            <li class="page-item">
+                <a class="page-link" href="?{% query_transform page=page.number|add:1 %}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">下一页</span>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
