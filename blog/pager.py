@@ -18,14 +18,10 @@ class Page:
         end = self.number + self.num_show_pages // 2
         if start < 1:
             start = 1
-            end = start + self.num_show_pages - 1
-            if end > self.num_pages:
-                end = self.num_pages
+            end = min(start + self.num_show_pages - 1, self.num_pages)
         elif end > self.num_pages:
             end = self.num_pages
-            start = end - self.num_show_pages + 1
-            if start < 1:
-                start = 1
+            start = max(end - self.num_show_pages + 1, 1)
         if end < self.num_pages:
             self.has_right_most = True
             if end < self.num_pages - 1:
@@ -48,14 +44,10 @@ def page(i, num_pages):
 
     if start < 1:
         start = 1
-        end = start + num_show_pages - 1
-        if end > num_pages:
-            end = num_pages
+        end = min(start + num_show_pages - 1, num_pages)
     elif end > num_pages:
         end = num_pages
-        start = end - num_show_pages + 1
-        if start < 1:
-            start = 1
+        start = max(end - num_show_pages + 1, 1)
 
     has_right_most = False
     has_left_most = False
